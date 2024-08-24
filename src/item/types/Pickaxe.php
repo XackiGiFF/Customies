@@ -8,6 +8,7 @@ use customiesdevs\customies\item\component\MiningSpeedComponent;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\enchantment\VanillaEnchantments;
+use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\item\Pickaxe as PM_Pickaxe;
 
 class Pickaxe extends PM_Pickaxe {
@@ -16,7 +17,7 @@ class Pickaxe extends PM_Pickaxe {
 		parent::__construct($identifier, $name, $tier);
 		$enchantment = EnchantmentIdMap::getInstance()->fromId(15);
 		$enchInstance = new EnchantmentInstance($enchantment, $this->getEfficiencyEnchantLevel());
-                $item->addEnchantment($enchInstance);
+                $this->addEnchantment($enchInstance);
 		$this->addComponent(new MiningSpeedComponent($this->getTypePickaxe(), $this->getMiningEfficiency(true)));
 	}
 	
