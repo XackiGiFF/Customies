@@ -23,8 +23,8 @@ declare(strict_types=1);
 
 namespace customiesdevs\customies\enchantments;
 
+use customiesdevs\customies\enchantments\VanillaEnchantments;
 use pocketmine\item\enchantment\Enchantment;
-use pocketmine\item\enchantment\VanillaEnchantments;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\data\bedrock\{
   IntSaveIdMapTrait,
