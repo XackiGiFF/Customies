@@ -58,7 +58,7 @@ use pocketmine\utils\RegistryTrait;
 final class VanillaEnchantments{
 	use RegistryTrait;
 
-	public static function setup() : void{
+	protected static function setup() : void{
 		self::register("PROTECTION", new ProtectionEnchantment(
 			"Protection",
 			Rarity::COMMON,
