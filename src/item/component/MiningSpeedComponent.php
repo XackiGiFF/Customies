@@ -12,7 +12,8 @@ final class MiningSpeedComponent implements ItemComponent {
 
 	private array $destroySpeeds;
 	private const TOOL_TYPES = ["wood", "stone", "iron", "gold", "diamond"];
-
+	private const TOOL_TYPE_HIGH_CLASS = ["iron", "gold", "diamond"];
+	
         public function __construct(private string $toolType = "wood", private int $mspeed) {
 		if (!in_array($this->toolType, self::TOOL_TYPES)) {
 			throw new Exception('Tool type not listed, default is wood!');
@@ -52,6 +53,8 @@ final class MiningSpeedComponent implements ItemComponent {
 			"Stone Brick Wall", 
 			"Stone Bricks Slab"
 			);
+
+		if (in_array($this->toolType, self::TOOL_TYPE_HIGH_CLASS)) $this->withBlocks($this->mspeed, "Netherite Block", "Ancient Debris");
 		
                 $this->withTags($this->mspeed, 'metal', $this->toolType.'_pick_diggable');
         }
