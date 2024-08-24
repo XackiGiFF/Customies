@@ -19,7 +19,7 @@ class Pickaxe extends PM_Pickaxe {
 		$enchantment = EnchantmentIdMap::getInstance()->fromId(15);
 		$enchInstance = new EnchantmentInstance($enchantment, $this->getEfficiencyEnchantLevel());
                 $this->addEnchantment($enchInstance);
-		$this->addComponent(new MiningSpeedComponent($this->getTypePickaxe(), $this->getMiningEfficiency(true)));
+		$this->addComponent(new MiningSpeedComponent($this->getTypePickaxe(), (int)$this->getMiningEfficiency(true)));
 	}
 	
 
