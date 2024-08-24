@@ -9,6 +9,7 @@ use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\enchantment\VanillaEnchantments;
 use pocketmine\data\bedrock\EnchantmentIdMap;
+use pocketmine\item\ItemIdentifier;
 use pocketmine\item\Pickaxe as PM_Pickaxe;
 
 class Pickaxe extends PM_Pickaxe {
