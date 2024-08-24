@@ -12,12 +12,14 @@ use pocketmine\item\Pickaxe as PM_Pickaxe;
 
 class Pickaxe extends PM_Pickaxe {
 	
-	/* Example:
-	*  public function __construct(ItemIdentifier $identifier, string $name = "Unknown") {
-	*	 parent::__construct($identifier, $name, \pocketmine\item\ToolTier::NETHERITE());
-	*	 $this->addComponent(new MiningSpeedComponent($this->getTypePickaxe(), $this->getMiningEfficiency(true)));
-	*  }
-	*/
+	public function __construct(ItemIdentifier $identifier, string $name = "Unknown", \pocketmine\item\ToolTier $tier) {
+		parent::__construct($identifier, $name, $tier);
+		$enchantment = EnchantmentIdMap::getInstance()->fromId(15);
+		$enchInstance = new EnchantmentInstance($enchantment, $this->getEfficiencyEnchantLevel());
+                $item->addEnchantment($enchInstance);
+		$this->addComponent(new MiningSpeedComponent($this->getTypePickaxe(), $this->getMiningEfficiency(true)));
+	}
+	
 
 	public function getTypePickaxe(): string{
 		return "wood";
