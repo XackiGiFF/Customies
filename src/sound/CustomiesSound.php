@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace customiesdevs\customies\particle;
+namespace customiesdevs\customies\sound;
 
 use pocketmine\world\sound\Sound;
 use pocketmine\math\Vector3;
