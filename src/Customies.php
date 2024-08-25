@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace customiesdevs\customies;
 
-use customiesdevs\customies\enchantments\{EnchantmentIdMap, VanillaEnchantments};
 use customiesdevs\customies\block\CustomiesBlockFactory;
 use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\ClosureTask;
@@ -14,10 +13,7 @@ final class Customies extends PluginBase {
 		$this->getServer()->getPluginManager()->registerEvents(new CustomiesListener(), $this);
 
 		$cachePath = $this->getDataFolder() . "idcache";
-
-		/*VanillaEnchantments::setup();
-		EnchantmentIdMap::getInstance()->init();
-		*/
+		
 		$this->getScheduler()->scheduleDelayedTask(new ClosureTask(static function () use ($cachePath): void {
 			// This task is scheduled with a 0-tick delay so it runs as soon as the server has started. Plugins should
 			// register their custom blocks and entities in onEnable() before this is executed.
