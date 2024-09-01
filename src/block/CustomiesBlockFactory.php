@@ -20,14 +20,17 @@ use pocketmine\data\bedrock\block\convert\BlockStateWriter;
 use pocketmine\inventory\CreativeInventory;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ListTag;
+use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\network\mcpe\protocol\types\BlockPaletteEntry;
 use pocketmine\network\mcpe\protocol\types\CacheableNbt;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\world\format\io\GlobalBlockStateHandlers;
 use function array_map;
+use function array_merge;
 use function array_reverse;
 use function hash;
+use function ksort;
 use function strcmp;
 use function usort;
 
@@ -39,10 +42,11 @@ final class CustomiesBlockFactory {
 	 * @phpstan-var array<string, array{(Closure(int): Block), (Closure(BlockStateWriter): Block), (Closure(Block): BlockStateReader)}>
 	 */
 	private array $blockFuncs = [];
-	/** @var BlockPaletteEntry[] */
+	/** @var BlockPaletteEntry[][] */
 	private array $blockPaletteEntries = [];
 	/** @var array<string, Block> */
 	private array $customBlocks = [];
+	private bool $sorted = false;
 
 	/**
 	 * Adds a worker initialize hook to the async pool to sync the BlockFactory for every thread worker that is created.
@@ -69,10 +73,20 @@ final class CustomiesBlockFactory {
 
 	/**
 	 * Returns all the block palette entries that need to be sent to the client.
-	 * @return BlockPaletteEntry[]
+	 * @return BlockPaletteEntry[]|BlockPaletteEntry[][]
 	 */
-	public function getBlockPaletteEntries(): array {
-		return $this->blockPaletteEntries;
+	public function getBlockPaletteEntries(?int $protocolId = null): array {
+		ksort($this->blockPaletteEntries);
+		if($protocolId === null){
+			return $this->blockPaletteEntries;
+		}
+		$blockPaletteEntries = [];
+		foreach($this->blockPaletteEntries as $paletteProtocol => $entries){
+			if($protocolId <= $paletteProtocol){
+				$blockPaletteEntries = array_merge($blockPaletteEntries, $entries);
+			}
+		}
+		return $blockPaletteEntries;
 	}
 
 	/**
@@ -180,16 +194,36 @@ final class CustomiesBlockFactory {
 		$this->blockPaletteEntries[] = new BlockPaletteEntry($identifier, new CacheableNbt($propertiesTag));
 		$this->blockFuncs[$identifier] = [$blockFunc, $serializer, $deserializer];
 
-		// 1.20.60 added a new "block_id" field which depends on the order of the block palette entries. Every time we
-		// insert a new block, we need to re-sort the block palette entries to keep in sync with the client.
-		usort($this->blockPaletteEntries, static function(BlockPaletteEntry $a, BlockPaletteEntry $b): int {
-			return strcmp(hash("fnv164", $a->getName()), hash("fnv164", $b->getName()));
-		});
-		foreach($this->blockPaletteEntries as $i => $entry) {
-			$root = $entry->getStates()->getRoot()
-				->setTag("vanilla_block_data", CompoundTag::create()
-					->setInt("block_id", 10000 + $i));
-			$this->blockPaletteEntries[$i] = new BlockPaletteEntry($entry->getName(), new CacheableNbt($root));
-		}
-	}
+        // 1.20.60 added a new "block_id" field which depends on the order of the block palette entries. Every time we
+        // insert a new block, we need to re-sort the block palette entries to keep in sync with the client.
+        usort($this->blockPaletteEntries, static function(BlockPaletteEntry $a, BlockPaletteEntry $b): int {
+            return strcmp(hash("fnv164", $a->getName()), hash("fnv164", $b->getName()));
+        });
+        foreach($this->blockPaletteEntries as $i => $entry) {
+            $root = $entry->getStates()->getRoot()
+                ->setTag("vanilla_block_data", CompoundTag::create()
+                    ->setInt("block_id", 10000 + $i));
+            $this->blockPaletteEntries[$i] = new BlockPaletteEntry($entry->getName(), new CacheableNbt($root));
+        }
+    }
+
+    public function sort() : void{
+        foreach($this->blockPaletteEntries as $protocolId => $entries){
+            if($protocolId < 649){
+                continue;
+            }
+            // 1.20.60 added a new "block_id" field which depends on the order of the block palette entries. Every time we
+            // insert a new block, we need to re-sort the block palette entries to keep in sync with the client.
+            usort($entries, static function(BlockPaletteEntry $a, BlockPaletteEntry $b): int {
+                return strcmp(hash("fnv164", $a->getName()), hash("fnv164", $b->getName()));
+            });
+            foreach($entries as $i => $entry){
+                $root = $entry->getStates()->getRoot()
+                    ->setTag("vanilla_block_data", CompoundTag::create()
+                        ->setInt("block_id", 10000 + $i));
+                $this->blockPaletteEntries[$protocolId][$i] = new BlockPaletteEntry($entry->getName(), new CacheableNbt($root));
+            }
+        }
+        $this->sorted = true;
+    }
 }
