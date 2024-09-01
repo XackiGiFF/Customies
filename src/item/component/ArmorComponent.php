@@ -5,6 +5,7 @@ namespace customiesdevs\customies\item\component;
 
 final class ArmorComponent implements ItemComponent {
 
+
 	public const TEXTURE_TYPE_CHAIN = "chain";
 	public const TEXTURE_TYPE_DIAMOND = "diamond";
 	public const TEXTURE_TYPE_ELYTRA = "elytra";

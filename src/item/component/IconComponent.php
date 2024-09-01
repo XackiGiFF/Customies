@@ -19,7 +19,9 @@ final class IconComponent implements ItemComponent {
 		return [
 			"textures" => [
 				"default" => $this->texture
-			]
+			],
+            "texture" => $this->texture
+
 		];
 	}
 
